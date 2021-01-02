@@ -548,9 +548,11 @@ PrivateTmp=true
 WantedBy=multi-user.target
 EOF
 
-echo "$0 - Starting stacks-node service"
 sudo systemctl enable stacks-node.service
-sudo systemctl start stacks-node.service
+
+echo "$0 - stacks-node service installed"
+echo "$0 to start use: sudo systemctl start stacks-node.service
+echo "$0 to stop use: sudo systemctl stop stacks-node.service
 
 # Finished, exit script
 exit 1
