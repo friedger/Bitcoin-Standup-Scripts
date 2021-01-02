@@ -264,7 +264,8 @@ echo "$0 - Downloading Bitcoin; this will also take a while!"
 export BITCOIN="bitcoin-core-0.20.1"
 export BITCOINPLAIN=`echo $BITCOIN | sed 's/bitcoin-core/bitcoin/'`
 
-sudo -u standup wget https://bitcoincore.org/bin/$BITCOIN/$BITCOINPLAIN-arm-linux-gnueabihf.tar.gz -O ~standup/$BITCOINPLAIN-arm-linux-gnueabihf.tar.gz
+https://bitcoin.org/bin/bitcoin-core-0.20.1/bitcoin-0.20.1-aarch64-linux-gnu.tar.gz
+sudo -u standup wget https://bitcoincore.org/bin/$BITCOIN/$BITCOINPLAIN-aarch64-linux-gnu.tar.gz -O ~standup/$BITCOINPLAIN-aarch64-linux-gnu.tar.gz
 sudo -u standup wget https://bitcoincore.org/bin/$BITCOIN/SHA256SUMS.asc -O ~standup/SHA256SUMS.asc
 sudo -u standup wget https://bitcoin.org/laanwj-releases.asc -O ~standup/laanwj-releases.asc
 
@@ -287,8 +288,8 @@ else
 fi
 
 # Verify Bitcoin: SHA
-export TARSHA256=`/usr/bin/sha256sum ~standup/$BITCOINPLAIN-arm-linux-gnueabihf.tar.gz | awk '{print $1}'`
-export EXPECTEDSHA256=`cat ~standup/SHA256SUMS.asc | grep $BITCOINPLAIN-arm-linux-gnueabihf.tar.gz | awk '{print $1}'`
+export TARSHA256=`/usr/bin/sha256sum ~standup/$BITCOINPLAIN-aarch64-linux-gnu.tar.gz | awk '{print $1}'`
+export EXPECTEDSHA256=`cat ~standup/SHA256SUMS.asc | grep $BITCOINPLAIN-aarch64-linux-gnu.tar.gz | awk '{print $1}'`
 
 if [ "$TARSHA256" == "$EXPECTEDSHA256" ]
 then
@@ -304,7 +305,7 @@ fi
 # Install Bitcoin
 echo "$0 - Installinging Bitcoin."
 
-sudo -u standup /bin/tar xzf ~standup/$BITCOINPLAIN-arm-linux-gnueabihf.tar.gz -C ~standup
+sudo -u standup /bin/tar xzf ~standup/$BITCOINPLAIN-aarch64-linux-gnu.tar.gz -C ~standup
 /usr/bin/install -m 0755 -o root -g root -t /usr/local/bin ~standup/$BITCOINPLAIN/bin/*
 /bin/rm -rf ~standup/$BITCOINPLAIN/
 
