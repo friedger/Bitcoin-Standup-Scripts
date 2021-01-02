@@ -133,6 +133,9 @@ apt-get -y install unattended-upgrades
 
 echo "$0 - Updated Debian Packages"
 
+# get unzip tool
+sudo apt-get install unzip
+
 # get uncomplicated firewall and deny all incoming connections except SSH
 sudo apt-get install ufw
 ufw allow ssh
@@ -260,7 +263,7 @@ echo "$0 - Downloading Bitcoin; this will also take a while!"
 # Change as necessary
 export BITCOIN="bitcoin-core-0.20.1"
 export BITCOINPLAIN=`echo $BITCOIN | sed 's/bitcoin-core/bitcoin/'`
-https://bitcoin.org/bin/bitcoin-core-0.20.1/bitcoin-0.20.1-arm-linux-gnueabihf.tar.gz
+
 sudo -u standup wget https://bitcoincore.org/bin/$BITCOIN/$BITCOINPLAIN-arm-linux-gnueabihf.tar.gz -O ~standup/$BITCOINPLAIN-arm-linux-gnueabihf.tar.gz
 sudo -u standup wget https://bitcoincore.org/bin/$BITCOIN/SHA256SUMS.asc -O ~standup/SHA256SUMS.asc
 sudo -u standup wget https://bitcoin.org/laanwj-releases.asc -O ~standup/laanwj-releases.asc
@@ -463,23 +466,23 @@ echo "$0 - Downloading Stacks Node; this will also take a while!"
 # CURRENT RELEASE from github
 export STACKSNODE_URL=`curl -s https://api.github.com/repos/blockstack/stacks-blockchain/releases/latest | grep 'browser_' | grep 'arm64' | cut -d\" -f4`
 
-sudo -u standup wget $STACKS_NODE_URL -O ~standup/stacks-blockchain-linux-arm64.zip
+sudo -u standup wget $STACKSNODE_URL -O ~standup/stacks-blockchain-linux-arm64.zip
 
 
 # Install Stacks Node
 echo "$0 - Installinging Stacks Node."
 
 sudo -u standup /bin/unzip ~standup/stacks-blockchain-linux-arm64.zip -d ~standup/stacks-blockchain
-/usr/bin/install -m 0755 -o root -g root -t /usr/local/bin ~standup/~standup/stacks-blockchain/*
-/bin/rm -rf ~standup/stacks-blockchain
-/bin/rm ~standup/stacks-blockchain-linux-arm64.zip
+sudo /usr/bin/install -m 0755 -o root -g root -t /usr/local/bin ~standup/stacks-blockchain/*
+sudo /bin/rm -rf ~standup/stacks-blockchain
+sudo /bin/rm ~standup/stacks-blockchain-linux-arm64.zip
 
 # Configure Stacks Node
 echo "$0 - Configuring Stacks Node."
 
 sudo -u standup /bin/mkdir ~standup/.stacks
 
-cat >> ~standup/.stacks/xenon.toml << EOF
+sudo cat >> ~standup/.stacks/xenon.toml << EOF
 [node]
 rpc_bind = "0.0.0.0:20443"
 p2p_bind = "0.0.0.0:20444"
