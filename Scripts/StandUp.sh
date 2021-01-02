@@ -92,6 +92,9 @@ SYS_SSH_IP=$4
 # Optional password for the standup non-privileged account - if you do not want to add one add "" as an argument
 USERPASSWORD=$5
 
+# private key of miner address for stacks node
+MINER_PRIVKEY=$6
+
 # Force check for root, if you are not logged in as root then the script will not execute
 if ! [ "$(id -u)" = 0 ]
 then
@@ -451,6 +454,103 @@ echo "$0 - *********************************************************************
 echo "$0 - Bitcoin is setup as a service and will automatically start if your VPS reboots and so is Tor"
 echo "$0 - You can manually stop Bitcoin with: sudo systemctl stop bitcoind.service"
 echo "$0 - You can manually start Bitcoin with: sudo systemctl start bitcoind.service"
+
+####
+# 7. Install stacks-node
+####
+echo "$0 - Downloading Stacks Node; this will also take a while!"
+
+# CURRENT RELEASE from github
+export STACKSNODE_URL=`curl -s https://api.github.com/repos/blockstack/stacks-blockchain/releases/latest | grep 'browser_' | grep 'arm64' | cut -d\" -f4`
+
+sudo -u standup wget $STACKS_NODE_URL -O ~standup/stacks-blockchain-linux-arm64.zip
+
+
+# Install Stacks Node
+echo "$0 - Installinging Stacks Node."
+
+sudo -u standup /bin/unzip ~standup/stacks-blockchain-linux-arm64.zip -d ~standup/stacks-blockchain
+/usr/bin/install -m 0755 -o root -g root -t /usr/local/bin ~standup/~standup/stacks-blockchain/*
+/bin/rm -rf ~standup/stacks-blockchain
+/bin/rm ~standup/stacks-blockchain-linux-arm64.zip
+
+# Configure Stacks Node
+echo "$0 - Configuring Stacks Node."
+
+sudo -u standup /bin/mkdir ~standup/.stacks
+
+cat >> ~standup/.stacks/xenon.toml << EOF
+[node]
+rpc_bind = "0.0.0.0:20443"
+p2p_bind = "0.0.0.0:20444"
+seed = "$MINER_KEY"
+# local_peer_seed is optional
+#local_peer_seed = "replace-with-your-private-key"
+miner = true
+bootstrap_node = "047435c194e9b01b3d7f7a2802d6684a3af68d05bbf4ec8f17021980d777691f1d51651f7f1d566532c804da506c117bbf79ad62eea81213ba58f8808b4d9504ad@xenon.blockstack.org:20444"
+working_dir = "/home/standup/.stacks/xenon"
+burn_fee_cap = 20000
+
+[burnchain]
+chain = "bitcoin"
+mode = "xenon"
+peer_host = "127.0.0.1"
+rpc_port = 18332
+peer_port = 18333
+username = "StandUp"
+password = "$RPCPASSWORD"
+
+[[ustx_balance]]
+address = "STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6"
+amount = 10000000000000000
+
+[[ustx_balance]]
+address = "ST11NJTTKGVT6D1HY4NJRVQWMQM7TVAR091EJ8P2Y"
+amount = 10000000000000000
+
+[[ustx_balance]]
+address = "ST1HB1T8WRNBYB0Y3T7WXZS38NKKPTBR3EG9EPJKR"
+amount = 10000000000000000
+
+[[ustx_balance]]
+address = "STRYYQQ9M8KAF4NS7WNZQYY59X93XEKR31JP64CP"
+amount = 10000000000000000
+EOF
+
+/bin/chown standup ~standup/.stacks/xenon.toml
+/bin/chmod 600 ~standup/.stacks/xenon.toml
+
+# Setup stacks-node as a service 
+echo "$0 - Setting up Stacks Node as a systemd service."
+
+sudo cat > /etc/systemd/system/stacks-node.service << EOF
+[Unit]
+Description=Stacks Xenon Testnet
+After=network.target
+After=bitcoind.service
+Requires=bitcoind.service
+
+[Service]
+Type=simple
+Restart=always
+User=standup
+Group=sudo
+Environment=BLOCKSTACK_DEBUG=1
+Environment=RUST_BACKTRACE=FULL
+ExecStart=/usr/local/bin/stacks-node start --config=/home/standup/.stacks/xenon.toml
+MemoryDenyWriteExecute=true
+PrivateDevices=true
+ProtectSystem=full
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+echo "$0 - Starting stacks-node service"
+sudo systemctl enable stacks-node.service
+sudo systemctl start stacks-node.service
 
 # Finished, exit script
 exit 1
