@@ -47,12 +47,13 @@ The `$` represents a terminal command prompt; do not actually type in a `$`.
    `$ chmod +x standup.sh`
 
 5. Run the script with the optional arguments like :
-   `$ ./standup.sh "<insert Tor V3 pubkey>" "<insert node type>" "<insert ssh key>" "<insert ssh allowed IP's>" "<insert password for standup user>"`
+   `$ ./standup.sh "<insert Tor V3 pubkey>" "<insert node type>" "<insert ssh key>" "<insert ssh allowed IP's>" "<insert password for standup user>" <insert stacks miner private key>`
    -  It is highly recommended to add a `Tor V3 pubkey` for cookie authentication, so that even if your QR code is compromised an attacker would not be able to access your node.
    -  The `node type` is  "Mainnet", "Pruned Mainnet", "Testnet", "Pruned Testnet", or "Private Regtest", default is "Pruned Testnet".
    -  If you supply a `SSH_KEY` in the arguments, you will be able to easily access your node via SSH using your rsa pubkey.
    -  If you add `SYS_SSH_IP`, you host willl only accept SSH connections from those IPs.
    -  The `password` is used for a user called `standup`.
+   -  Stack miner private key is required.  For help generating a key see [Stacks Mining Docs](https://docs.blockstack.org/start-mining/mainnet#running-a-miner) or [stacks-gen](https://github.com/psq/stacks-gen) (recommended).
 
 ### Method Two: Install Using `LinodeStandup.sh`
 
